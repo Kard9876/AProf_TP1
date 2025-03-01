@@ -59,9 +59,7 @@ class NeuralNetwork:
 
         return error
 
-    def fit(self, dataset):
-        X = dataset.X
-        y = dataset.y
+    def fit(self, X, y):
 
         if np.ndim(y) == 1:
             y = np.expand_dims(y, axis=1)
@@ -104,11 +102,11 @@ class NeuralNetwork:
 
         return self
 
-    def predict(self, dataset):
-        return self.forward_propagation(dataset.X, training=False)
+    def predict(self, X):
+        return self.forward_propagation(X, training=False)
 
-    def score(self, dataset, predictions):
+    def score(self, y, predictions):
         if self.metric is None:
             raise ValueError("No metric specified for the neural network.")
 
-        return self.metric(dataset.y, predictions)
+        return self.metric(y, predictions)

@@ -23,11 +23,11 @@ def main():
     net.add(SigmoidActivation())
 
     # train
-    net.fit(dataset)
+    net.fit(dataset.X, dataset.y)
 
     # test
-    out = net.predict(dataset)
-    print(net.score(dataset, out))
+    out = net.predict(dataset.X)
+    print(net.score(dataset.y, out))
 
 
 if __name__ == '__main__':
