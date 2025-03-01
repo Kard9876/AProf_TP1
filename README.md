@@ -18,4 +18,4 @@
 
 - Numpy
 - Pandas
-- Sklearn (usado para implementar bag of words)
+- Scikit-learn (usado para implementar bag of words)
