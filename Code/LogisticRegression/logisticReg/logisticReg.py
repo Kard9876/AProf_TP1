@@ -7,7 +7,8 @@ from Code.LogisticRegression.utils.sigmoid import sigmoid
 class LogisticRegression:
     def __init__(self, n_features):
         self._n_features = n_features
-        self.theta = self.theta = np.zeros(n_features)
+        self.theta =  np.zeros(n_features)
+
 
     def probability(self, instance):
         x = np.empty([self._n_features])
@@ -29,13 +30,13 @@ class LogisticRegression:
 
     def costFunction(self, X, y, theta=None):
         if theta is None: theta = self.theta
-
+        print("CF")
         m = X.shape[0]
         p = sigmoid(np.dot(X, theta))
 
         cost = (-y * np.log(p) - (1 - y) * np.log(1 - p))
         res = np.sum(cost) / m
-
+        print(res)
         return res
 
     def gradientDescent(self, X, y, alpha=0.01, iters=10000):
@@ -57,10 +58,14 @@ class LogisticRegression:
         self.optim_model()
 
     def optim_model(self, X, y):
+        print("Entrei")
         n = X.shape[1]
-        options = {'full_output': True, 'maxiter': 500}
+        options = {'maxiter': 10, 'full_output': True, 'disp': True, 'ftol': 1}
+
         initial_theta = np.zeros(n)
-        self.theta, _, _, _, _ = optimize.fmin(lambda theta: self.costFunction(theta, X, y), initial_theta, **options)
+
+        self.theta, _, _, _, _,_ = optimize.fmin(lambda theta: self.costFunction(X, y, theta), initial_theta,gtol=1,**options)
+        print("SAI")
 
     def printCoefs(self):
         print(self.theta)

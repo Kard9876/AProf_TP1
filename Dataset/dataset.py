@@ -31,15 +31,16 @@ with open(dataset,encoding="utf-8") as f:
         writerTest.writerow(['text', 'ai_generator'])
 
         for row in reader:
-            if linha < 600000:
+            if linha < 6000:
                 writerTraining.writerow([f"{clearText(row[1])}","0"])
                 writerTraining.writerow([f"{clearText(row[2])}","1"])
 
-            elif 600000 <= linha < 800000:
+            elif 6000 <= linha < 8000:
                 writerTest.writerow([f"{clearText(row[1])}", "0"])
                 writerTest.writerow([f"{clearText(row[2])}", "1"])
 
-            elif linha >= 800000:
+            elif linha >= 8000:
+                break
                 writerValidation.writerow([f"{clearText(row[1])}", "0"])
                 writerValidation.writerow([f"{clearText(row[2])}", "1"])
 
