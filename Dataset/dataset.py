@@ -2,13 +2,14 @@ import csv, sys,re
 
 dataset = "model_training_dataset.csv"
 
-datasetTraining = "dataset_training.csv"
-datasetValidation = "dataset_validation.csv"
-datasetTest = "dataset_test.csv"
+datasetTraining = "dataset_training_small.csv"
+datasetValidation = "dataset_validation_small.csv"
+datasetTest = "dataset_test_small.csv"
 
 #https://huggingface.co/datasets/dmitva/human_ai_generated_text
 
 def clearText(texto):
+    texto = re.sub(";", ".", texto)
     return re.sub("\n", '', texto)
 
 with open(dataset,encoding="utf-8") as f:
@@ -35,12 +36,12 @@ with open(dataset,encoding="utf-8") as f:
                 writerTraining.writerow([f"{clearText(row[2])}","1"])
 
             elif 600000 <= linha < 800000:
-                writerValidation.writerow([f"{clearText(row[1])}", "0"])
-                writerValidation.writerow([f"{clearText(row[2])}", "1"])
-
-            elif linha >= 800000:
                 writerTest.writerow([f"{clearText(row[1])}", "0"])
                 writerTest.writerow([f"{clearText(row[2])}", "1"])
+
+            elif linha >= 800000:
+                writerValidation.writerow([f"{clearText(row[1])}", "0"])
+                writerValidation.writerow([f"{clearText(row[2])}", "1"])
 
             linha += 1
 

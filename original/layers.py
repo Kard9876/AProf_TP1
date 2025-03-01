@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from abc import ABCMeta, abstractmethod
 import numpy as np
 import copy
 
+
 class Layer(metaclass=ABCMeta):
 
     @abstractmethod
-    def forward_propagation(self, input):
+    def forward_propagation(self, input, training):
         raise NotImplementedError
     
     @abstractmethod
