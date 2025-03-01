@@ -10,7 +10,9 @@
 
 ## Code
 
-- O código base usado para a nossa implementação de modelos foi o fornecido na aula PL03
+- O código base usado para a nossa implementação da DNN foi o fornecido na aula PL03
+- O código base usado para a nossa implementação da regressão logística foi o fornecido na aula PL01
+
 
 ## Dependencies
 
