@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 from Code.DNN.functions.mse import MeanSquaredError
@@ -5,19 +7,25 @@ from Code.DNN.functions.metrics import mse
 
 
 class NeuralNetwork:
-
-    def __init__(self, epochs=100, batch_size=128, optimizer=None, verbose=False, loss=MeanSquaredError(),
-                 metric: callable = mse):
+    def __init__(self, epochs=100, batch_size=128, optimizer=None, regulator=None, verbose=False, loss=MeanSquaredError(),
+                 metric: callable = mse, patience=-1, min_delta=0.001):
         self.epochs = epochs
         self.batch_size = batch_size
         self.optimizer = optimizer
         self.verbose = verbose
         self.loss = loss
         self.metric = metric
+        self._regulator = regulator
 
         # attributes
         self.layers = []
         self.history = {}
+
+        self._early_stop = patience > 0
+        self._patience = patience
+        self._patience_counter = 0
+        self._min_delta = min_delta
+        self._best_loss = math.inf
 
     def add(self, layer):
         if self.layers:
@@ -55,7 +63,7 @@ class NeuralNetwork:
         error = output_error
 
         for layer in reversed(self.layers):
-            error = layer.backward_propagation(error)
+            error = layer.backward_propagation(error, self._regulator)
 
         return error
 
@@ -76,6 +84,7 @@ class NeuralNetwork:
 
                 # Backward propagation
                 error = self.loss.derivative(y_batch, output)
+
                 self.backward_propagation(error)
 
                 output_x_.append(output)
@@ -99,6 +108,18 @@ class NeuralNetwork:
 
             if self.verbose:
                 print(f"Epoch {epoch}/{self.epochs} - loss: {loss:.4f} - {metric_s}")
+
+            # Early Stop. Implementation based of: https://cyborgcodes.medium.com/what-is-early-stopping-in-deep-learning-eeb1e710a3cf
+            if self._early_stop:
+                if loss < self._best_loss - self._min_delta:
+                    self._best_loss = loss
+                    self._patience_counter = 0
+                else:
+                    self._patience_counter += 1
+
+                    if self._patience_counter >= self._patience:
+                        print(f"Early stopping at epoch {epoch}")
+                        break
 
         return self
 

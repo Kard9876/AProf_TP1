@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class Optimizer(metaclass=ABCMeta):
+class Regulator(metaclass=ABCMeta):
     def __init__(self):
         pass
 

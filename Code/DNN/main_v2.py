@@ -6,8 +6,11 @@ from functions.metrics import mse, accuracy
 from networks.neuralnet import NeuralNetwork
 from functions.mse import MeanSquaredError
 from layers.dense import DenseLayer
-from optimizations.optimizer import Optimizer
+from layers.dropout import DropOutLayer
+from optimizations.retained_gradient import RetGradient
 from utils.data import read_csv
+from Code.DNN.optimizations.l1_reg import L1Reg
+from Code.DNN.optimizations.l2_reg import L2Reg
 
 
 def main():
@@ -32,13 +35,18 @@ def main():
     y_test = y_test.to_numpy()
 
     # network
-    optimizer = Optimizer(learning_rate=0.01, momentum=0.90)
+    optimizer = RetGradient(learning_rate=0.01, momentum=0.90)
     loss = MeanSquaredError()
-    net = NeuralNetwork(epochs=1000, batch_size=16, optimizer=optimizer, verbose=True, loss=loss, metric=accuracy)
+    # net = NeuralNetwork(epochs=1000, batch_size=16, optimizer=optimizer, verbose=True, loss=loss, metric=accuracy)
+
+    regulator = L2Reg(l2_val=0.001)
+    net = NeuralNetwork(epochs=15, batch_size=16, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
+                        metric=accuracy, patience=2, min_delta=0.015)
 
     n_features = X_train.shape[1]
     net.add(DenseLayer(6, (n_features,)))
     net.add(SigmoidActivation())
+    net.add(DropOutLayer(3, 0.5, (n_features,)))
     net.add(DenseLayer(1))
     net.add(SigmoidActivation())
 

@@ -11,7 +11,7 @@ class Layer(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def backward_propagation(self, error):
+    def backward_propagation(self, error, regulator=None):
         raise NotImplementedError
 
     @abstractmethod

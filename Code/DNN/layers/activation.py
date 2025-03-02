@@ -15,7 +15,7 @@ class ActivationLayer(Layer):
         self.output = self.activation_function(self.input)
         return self.output
 
-    def backward_propagation(self, output_error):
+    def backward_propagation(self, output_error, regulator=None):
         return self.derivative(self.input) * output_error
 
     @abstractmethod

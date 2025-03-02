@@ -37,11 +37,14 @@ class DenseLayer(Layer):
         self.output = np.dot(self.input, self.weights) + self.biases
         return self.output
 
-    def backward_propagation(self, output_error):
+    def backward_propagation(self, output_error, regulator=None):
         # computes the layer input error (the output error from the previous layer),
         # dE/dX, to pass on to the previous layer
         # SHAPES: (batch_size, input_columns) = (batch_size, output_columns) * (output_columns, input_columns)
         input_error = np.dot(output_error, self.weights.T)  # dE / dY = output error
+
+        if regulator is not None:
+            input_error += regulator.update(self.input.shape[0], self.weights)
 
         # computes the weight error: dE/dW = X.T * dE/dY
         # SHAPES: (input_columns, output_columns) = (input_columns, batch_size) * (batch_size, output_columns)
