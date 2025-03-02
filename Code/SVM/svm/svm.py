@@ -1,7 +1,7 @@
 # Sources:
 # https://www.youtube.com/watch?v=ofB9jj6sGro
 # https://github.com/SSaishruthi/SVM-using-Numpy/blob/master/SVM.ipynb
-#
+# https://medium.com/@saishruthi.tn/support-vector-machine-using-numpy-846f83f4183d
 
 import numpy as np
 

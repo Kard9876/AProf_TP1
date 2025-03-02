@@ -28,9 +28,12 @@ def main():
     n_features = X_train.shape[1]
 
     model = LogisticRegression(n_features)
-    model.optim_model(X_train, y_train)
 
-    print("Final cost:", model.costFunction(X_test, y_test))
+    maxiter = 10
+    maxfun = 10
+    model.optim_model(X_train, y_train, maxiter, maxfun)
+
+    print("Final cost:", model.cost_function(X_test, y_test))
 
 
 if __name__ == '__main__':
