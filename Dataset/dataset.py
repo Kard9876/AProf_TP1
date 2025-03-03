@@ -2,9 +2,9 @@ import csv, sys,re
 
 dataset = "model_training_dataset.csv"
 
-datasetTraining = "dataset_training_small.csv"
-datasetValidation = "dataset_validation_small.csv"
-datasetTest = "dataset_test_small.csv"
+datasetTraining = "dataset_training.csv"
+datasetValidation = "dataset_validation.csv"
+datasetTest = "dataset_test.csv"
 
 #https://huggingface.co/datasets/dmitva/human_ai_generated_text
 
@@ -31,16 +31,15 @@ with open(dataset,encoding="utf-8") as f:
         writerTest.writerow(['text', 'ai_generator'])
 
         for row in reader:
-            if linha < 6000:
+            if linha < 600000:
                 writerTraining.writerow([f"{clearText(row[1])}","0"])
                 writerTraining.writerow([f"{clearText(row[2])}","1"])
 
-            elif 6000 <= linha < 8000:
+            elif 600000 <= linha < 800000:
                 writerTest.writerow([f"{clearText(row[1])}", "0"])
                 writerTest.writerow([f"{clearText(row[2])}", "1"])
 
-            elif linha >= 8000:
-                break
+            elif linha >= 800000:
                 writerValidation.writerow([f"{clearText(row[1])}", "0"])
                 writerValidation.writerow([f"{clearText(row[2])}", "1"])
 
