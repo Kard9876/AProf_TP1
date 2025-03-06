@@ -1,6 +1,3 @@
-import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
-
 from layers.sigmoid import SigmoidActivation
 from functions.metrics import mse, accuracy
 from networks.neuralnet import NeuralNetwork
@@ -8,40 +5,27 @@ from functions.mse import MeanSquaredError
 from layers.dense import DenseLayer
 from layers.dropout import DropOutLayer
 from optimizations.retained_gradient import RetGradient
-from utils.data import read_csv
 from Code.DNN.optimizations.l1_reg import L1Reg
 from Code.DNN.optimizations.l2_reg import L2Reg
 
+from Code.utils.dataset import Dataset
+
 
 def main():
-    # training data
+    dataset = Dataset('../../Dataset/dataset_training_small.csv', '../../Dataset/dataset_validation_small.csv',
+                      '../../Dataset/dataset_test_small.csv')
 
-    train = pd.read_csv('../../Dataset/dataset_training_small.csv', sep=';')
-    test = pd.read_csv('../../Dataset/dataset_test_small.csv', sep=';')
-
-    vectorizer = CountVectorizer()
-
-    X_train = train.drop('ai_generator', inplace=False, axis=1)
-    vectorizer.fit(X_train['text'])
-    X_train = vectorizer.transform(X_train['text']).toarray()
-
-    y_train = train['ai_generator']
-    y_train = y_train.to_numpy()
-
-    X_test = test.drop('ai_generator', inplace=False, axis=1)
-    X_test = vectorizer.transform(X_test['text']).toarray()
-
-    y_test = test['ai_generator']
-    y_test = y_test.to_numpy()
+    # Remover pontuação deu pior resultado
+    X_train, y_train, X_validation, y_validation, X_test, y_test = dataset.get_datasets('text', 'ai_generator', sep=';',
+                                                                                        rem_punctuation=False)
 
     # network
     optimizer = RetGradient(learning_rate=0.01, momentum=0.90)
     loss = MeanSquaredError()
-    # net = NeuralNetwork(epochs=1000, batch_size=16, optimizer=optimizer, verbose=True, loss=loss, metric=accuracy)
 
     regulator = L2Reg(l2_val=0.001)
     net = NeuralNetwork(epochs=15, batch_size=16, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
-                        metric=accuracy, patience=2, min_delta=0.015)
+                        metric=accuracy, patience=2, min_delta=0.001)
 
     n_features = X_train.shape[1]
     net.add(DenseLayer(6, (n_features,)))

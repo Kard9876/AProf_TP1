@@ -5,28 +5,15 @@ from sklearn.feature_extraction.text import CountVectorizer
 from Code.SVM.svm.svm import SVM
 from Code.SVM.utils.metrics import accuracy
 from Code.SVM.utils.data import read_csv
+from Code.utils.dataset import Dataset
 
 
 def main():
-    # training data
+    dataset = Dataset('../../Dataset/dataset_training_small.csv', '../../Dataset/dataset_validation_small.csv',
+                      '../../Dataset/dataset_test_small.csv')
 
-    train = pd.read_csv('../../Dataset/dataset_training_small.csv', sep=';')
-    test = pd.read_csv('../../Dataset/dataset_test_small.csv', sep=';')
-
-    vectorizer = CountVectorizer()
-
-    X_train = train.drop('ai_generator', inplace=False, axis=1)
-    vectorizer.fit(X_train['text'])
-    X_train = vectorizer.transform(X_train['text']).toarray()
-
-    y_train = train['ai_generator']
-    y_train = y_train.to_numpy()
-
-    X_test = test.drop('ai_generator', inplace=False, axis=1)
-    X_test = vectorizer.transform(X_test['text']).toarray()
-
-    y_test = test['ai_generator']
-    y_test = y_test.to_numpy()
+    X_train, y_train, X_validation, y_validation, X_test, y_test = dataset.get_datasets('text', 'ai_generator', sep=';',
+                                                                                        rem_punctuation=False)
 
     n_features = X_train.shape[1]
 
