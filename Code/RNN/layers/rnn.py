@@ -2,6 +2,7 @@ from copy import deepcopy
 from typing import Tuple
 
 import numpy as np
+from numpy.core.multiarray import ndarray
 
 # from si.neural_networks.activation import TanhActivation, ActivationLayer
 # from si.neural_networks.layers import Layer
@@ -58,10 +59,11 @@ class RNN(Layer):
         # Initialize the weights
         limit = 1 / np.sqrt(input_dim)
         self.U = np.random.uniform(-limit, limit, (self.n_units, input_dim))
+
         limit = 1 / np.sqrt(self.n_units)
         self.V = np.random.uniform(-limit, limit, (input_dim, self.n_units))
         self.W = np.random.uniform(-limit, limit, (self.n_units, self.n_units))
-        
+
         # Weight optimizers
         self.U_opt = deepcopy(optimizer)
         self.V_opt = deepcopy(optimizer)
@@ -161,7 +163,7 @@ class RNN(Layer):
 
         return self.input_shape
 
-    def parameters(self) -> int:
+    def parameters(self) -> ndarray:
         """
         Returns the number of parameters of the layer.
 

@@ -3,6 +3,7 @@ from functions.metrics import mse, accuracy
 from networks.recorrent_neural_network import RecorrentNeuralNetwork
 from functions.mse import MeanSquaredError
 from layers.rnn import RNN
+from layers.dense import DenseLayer
 from optimizations.retained_gradient import RetGradient
 from Code.DNN.optimizations.l2_reg import L2Reg
 
@@ -18,18 +19,19 @@ def main():
                                                                                         rem_punctuation=False)
 
     timestep = 2
+    batch_size = 6
 
     # network
     optimizer = RetGradient(learning_rate=0.01, momentum=0.90)
     loss = MeanSquaredError()
 
     regulator = L2Reg(l2_val=0.001)
-    net = RecorrentNeuralNetwork(epochs=15, batch_size=2, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
+    net = RecorrentNeuralNetwork(epochs=3, batch_size=batch_size, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
                         metric=accuracy, patience=2, min_delta=0.001, timestep=timestep)
 
-    input_shape = (X_train.shape[0] // timestep, X_train.shape[1])
-
-    net.add(RNN(5, input_shape=input_shape))
+    net.add(RNN(5, input_shape=(timestep, X_train.shape[1])))
+    net.add(SigmoidActivation())
+    net.add(DenseLayer(1, timestep))
     net.add(SigmoidActivation())
 
     # train
@@ -37,6 +39,7 @@ def main():
 
     # test
     out = net.predict(X_test)
+    out = out.reshape(out.shape[1], 1)
     print(net.score(y_test, out))
 
 

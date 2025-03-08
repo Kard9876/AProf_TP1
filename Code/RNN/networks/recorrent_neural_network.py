@@ -10,6 +10,9 @@ from Code.RNN.layers.rnn import RNN
 class RecorrentNeuralNetwork:
     def __init__(self, epochs=100, batch_size=128, optimizer=None, regulator=None, verbose=False, loss=MeanSquaredError(),
                  metric: callable = mse, patience=-1, min_delta=0.001, timestep=2):
+
+        assert batch_size % timestep == 0, "Batch size should be divisable by timestep"
+
         self.epochs = epochs
         self.batch_size = batch_size
         self.optimizer = optimizer
@@ -57,14 +60,7 @@ class RecorrentNeuralNetwork:
         output = X
 
         for layer in self.layers:
-            if hasattr(layer, 'is_rnn') and layer.is_rnn:
-                tmp = output.reshape(self._timestep, self.batch_size, output.shape[0] // (self._timestep * self.batch_size))
-                tmp2 = tmp.reshape(output.shape)
-
-                print(tmp2 == output)
-                pass
-            else:
-                output = layer.forward_propagation(output, training)
+            output = layer.forward_propagation(output, training)
 
         return output
 
@@ -73,7 +69,7 @@ class RecorrentNeuralNetwork:
 
         for layer in reversed(self.layers):
             if hasattr(layer, 'is_rnn') and layer.is_rnn:
-                pass
+                error = layer.backward_propagation(error)
             else:
                 error = layer.backward_propagation(error, self._regulator)
 
@@ -84,6 +80,8 @@ class RecorrentNeuralNetwork:
         if np.ndim(y) == 1:
             y = np.expand_dims(y, axis=1)
 
+        assert X.shape[0] % self.batch_size == 0
+
         self.history = {}
         for epoch in range(1, self.epochs + 1):
             # store mini-batch data for epoch loss and quality metrics calculation
@@ -91,13 +89,23 @@ class RecorrentNeuralNetwork:
             y_ = []
 
             for X_batch, y_batch in self.get_mini_batches(X, y):
+                input_x = X_batch.reshape(X_batch.shape[0] // self._timestep, self._timestep, X_batch.shape[1])
+
                 # Forward propagation
-                output = self.forward_propagation(X_batch, training=True)
+                output = self.forward_propagation(input_x, training=True)
+
+                output_shape = output.shape
+
+                output = output.reshape(output_shape[0] * output_shape[1], output_shape[2])
 
                 # Backward propagation
                 error = self.loss.derivative(y_batch, output)
 
+                error = error.reshape(output_shape[0], output_shape[1], output_shape[2])
+
                 self.backward_propagation(error)
+
+                output = output.reshape(output.shape[0] * output.shape[1], 1)
 
                 output_x_.append(output)
                 y_.append(y_batch)
@@ -136,6 +144,7 @@ class RecorrentNeuralNetwork:
         return self
 
     def predict(self, X):
+        X = X.reshape(1, X.shape[0], X.shape[1])
         return self.forward_propagation(X, training=False)
 
     def score(self, y, predictions):
