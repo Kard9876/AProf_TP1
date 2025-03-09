@@ -1,75 +1,34 @@
+import sys
+import os
+
 import pandas as pd
 import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
 
 from Code.SVM.svm.svm import SVM
 from Code.SVM.utils.metrics import accuracy
 from Code.SVM.utils.data import read_csv
+from Code.utils.dataset import Dataset
 
 
-# Muito lento
-def get_bow_matrix(df, vocab):
-    # Inicializar a matriz BoW
-    bow_matrix = np.zeros((len(df), len(vocab)))
+def main(args):
+    np.random.seed(42)
 
-    # Preencher a matriz BoW
-    for i, text in enumerate(df['text']):
-        for word in text.split():
-            if word in vocab:
-                bow_matrix[i, vocab.index(word)] += 1
+    dataset = Dataset('../../Dataset/DatasetsGerados/dataset_training_input.csv',
+                      '../../Dataset/DatasetsGerados/dataset_training_output.csv',
+                      '../../Dataset/DatasetsGerados/dataset_validation_input.csv',
+                      '../../Dataset/DatasetsGerados/dataset_validation_output.csv',
+                      '../../Dataset/DatasetsGerados/dataset_test_input.csv',
+                      '../../Dataset/DatasetsGerados/dataset_test_output.csv')
 
-    return bow_matrix
-
-def main():
-    # training data
-
-    train = pd.read_csv('../../Dataset/dataset_training_small.csv', sep=';')
-    test = pd.read_csv('../../Dataset/dataset_test_small.csv', sep=';')
-
-    X_train = train.drop('ai_generator', inplace=False, axis=1)
-    n_features = X_train.shape[1]
-
-    X_train['text'] = X_train['text'].apply(hash)
-    X_train = X_train.to_numpy()
-    y_train = train['ai_generator']
-    y_train = y_train.to_numpy()
-
-    X_test = test.drop('ai_generator', inplace=False, axis=1)
-    X_test['text'] = X_test['text'].apply(hash)
-    X_test = X_test.to_numpy()
-    y_test = test['ai_generator']
-    y_test = y_test.to_numpy()
-
-    """
-    train = pd.read_csv('../../Dataset/dataset_training_small.csv', sep=';')
-    test = pd.read_csv('../../Dataset/dataset_test_small.csv', sep=';')
-
-    X_train = train.drop('ai_generator', inplace=False, axis=1)
-
-    vocab = list(set(" ".join(X_train['text']).split()))
-    X_train = get_bow_matrix(X_train, vocab)
-
-    y_train = train['ai_generator']
-    y_train = y_train.to_numpy()
-
-    X_test = test.drop('ai_generator', inplace=False, axis=1)
-    X_test = get_bow_matrix(X_test, vocab)
-
-    y_test = test['ai_generator']
-    y_test = y_test.to_numpy()
+    # Remover pontuação deu pior resultado
+    X_train, y_train, X_validation, y_validation, X_test, y_test, ids = dataset.get_datasets('Text', 'Label', sep='\t',
+                                                                                             rem_punctuation=False)
 
     n_features = X_train.shape[1]
-    """
 
-    """
-    dataset = read_csv('breast-bin.csv', sep=',', features=True, label=True)
-    X = dataset.X
-    y = dataset.y
-
-    n_features = X.shape[1]
-    """
-
-    learning_rate = 0.001
-    epochs = 1000
+    learning_rate = 0.0001
+    epochs = 10
     lambda_val = 0.01
 
     svm = SVM(n_features, learning_rate, epochs, lambda_val)
@@ -77,9 +36,19 @@ def main():
     # test
     svm.fit(X_train, y_train)
     out = svm.predict(X_test)
-    print(out)
-    print(accuracy(y_test, out))
+
+    if y_test is not None:
+        print(accuracy(y_test, out))
+
+    store_results = args[1] if len(args) > 1 else './Results/dnn_results.csv'
+    out = out.reshape(out.shape[0], 1)
+
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(store_results), exist_ok=True)
+
+    results = dataset.merge_results(ids, out)
+    results.to_csv(store_results, sep='\t', index=False)
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)

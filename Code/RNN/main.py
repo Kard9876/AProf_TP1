@@ -52,7 +52,9 @@ def main(args):
     # test
     out = net.predict(X_test)
     out = out.reshape(out.shape[1], 1)
-    print(net.score(y_test, out))
+
+    if y_test is not None:
+        print(net.score(y_test, out))
 
     net.plot_train_curves()
 

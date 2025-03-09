@@ -70,6 +70,7 @@ class Dataset:
             raise Exception("Please obtain train dataset first")
 
         X_test = pd.read_csv(self._test_input, sep=sep)
+        ids = X_test[id_column]
         X_test = X_test.drop(id_column, inplace=False, axis=1)
 
         if rem_punctuation:
@@ -77,14 +78,16 @@ class Dataset:
 
         X_test = self._vectorizer.transform(X_test[fit_column]).toarray()
 
-        y_test = pd.read_csv(self._test_output, sep=sep)
+        y_test = None
 
-        ids = y_test[id_column]
-        y_test = y_test.drop(id_column, inplace=False, axis=1)
-        y_test = y_test.to_numpy().reshape(y_test.shape[0], )
+        if self._test_output is not None:
+            y_test = pd.read_csv(self._test_output, sep=sep)
 
-        self._label_encoder_fitted = True
-        y_test = self._label_encoder.fit_transform(y_test)
+            y_test = y_test.drop(id_column, inplace=False, axis=1)
+            y_test = y_test.to_numpy().reshape(y_test.shape[0], )
+
+            self._label_encoder_fitted = True
+            y_test = self._label_encoder.fit_transform(y_test)
 
         return X_test, y_test, ids
 

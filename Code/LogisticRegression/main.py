@@ -32,7 +32,8 @@ def main(args):
     # model.optim_model(X_train, y_train, maxiter, maxfun)
     model.gradient_descent(X_train, y_train, alpha=0.01, iters=50)
 
-    print("Final cost:", model.cost_function(X_test, y_test))
+    if y_test is not None:
+        print("Final cost:", model.cost_function(X_test, y_test))
 
     out = model.predict_many(X_test)
     out = out.reshape(out.shape[0], 1)
