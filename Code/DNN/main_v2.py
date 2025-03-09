@@ -1,3 +1,5 @@
+import numpy as np
+
 from layers.sigmoid import SigmoidActivation
 from functions.metrics import mse, accuracy
 from networks.neuralnet import NeuralNetwork
@@ -7,11 +9,14 @@ from layers.dropout import DropOutLayer
 from optimizations.retained_gradient import RetGradient
 from Code.DNN.optimizations.l1_reg import L1Reg
 from Code.DNN.optimizations.l2_reg import L2Reg
+from Code.DNN.functions.bce import BinaryCrossEntropy
 
 from Code.utils.dataset import Dataset
 
 
 def main():
+    np.random.seed(42)
+
     dataset = Dataset('../../Dataset/dataset_training_small.csv', '../../Dataset/dataset_validation_small.csv',
                       '../../Dataset/dataset_test_small.csv')
 
@@ -21,7 +26,7 @@ def main():
 
     # network
     optimizer = RetGradient(learning_rate=0.01, momentum=0.90)
-    loss = MeanSquaredError()
+    loss = BinaryCrossEntropy()
 
     regulator = L2Reg(l2_val=0.001)
     net = NeuralNetwork(epochs=15, batch_size=16, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
@@ -35,11 +40,13 @@ def main():
     net.add(SigmoidActivation())
 
     # train
-    net.fit(X_train, y_train)
+    net.fit(X_train, y_train, X_val=X_validation, y_val=y_validation)
 
     # test
     out = net.predict(X_test)
     print(net.score(y_test, out))
+
+    net.plot_train_curves()
 
 
 if __name__ == '__main__':

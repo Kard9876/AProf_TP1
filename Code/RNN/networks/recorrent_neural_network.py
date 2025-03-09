@@ -1,11 +1,14 @@
 import math
+import matplotlib
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 from Code.RNN.functions.mse import MeanSquaredError
 from Code.RNN.functions.metrics import mse
 from Code.RNN.layers.rnn import RNN
 
+matplotlib.use('TkAgg')
 
 class RecorrentNeuralNetwork:
     def __init__(self, epochs=100, batch_size=128, optimizer=None, regulator=None, verbose=False, loss=MeanSquaredError(),
@@ -24,7 +27,8 @@ class RecorrentNeuralNetwork:
 
         # attributes
         self.layers = []
-        self.history = {}
+        self.train_history = {}
+        self.validation_history = {}
 
         self._early_stop = patience > 0
         self._patience = patience
@@ -75,14 +79,18 @@ class RecorrentNeuralNetwork:
 
         return error
 
-    def fit(self, X, y):
+    def fit(self, X, y, X_val=None, y_val=None):
 
         if np.ndim(y) == 1:
             y = np.expand_dims(y, axis=1)
 
-        assert X.shape[0] % self.batch_size == 0
+        assert X.shape[0] % self.batch_size == 0, "X's number of rows should be divisible by batch_size"
+        assert X_val is None or X_val.shape[0] % self.batch_size == 0, "X's number of rows should be divisible by batch_size"
 
-        self.history = {}
+        break_val = False
+
+        self.train_history = {}
+        self.validation_history = {}
         for epoch in range(1, self.epochs + 1):
             # store mini-batch data for epoch loss and quality metrics calculation
             output_x_ = []
@@ -96,7 +104,7 @@ class RecorrentNeuralNetwork:
 
                 output_shape = output.shape
 
-                output = output.reshape(output_shape[0] * output_shape[1], output_shape[2])
+                output = output.reshape(output_shape[0] * output_shape[1], 1)
 
                 # Backward propagation
                 error = self.loss.derivative(y_batch, output)
@@ -104,8 +112,6 @@ class RecorrentNeuralNetwork:
                 error = error.reshape(output_shape[0], output_shape[1], output_shape[2])
 
                 self.backward_propagation(error)
-
-                output = output.reshape(output.shape[0] * output.shape[1], 1)
 
                 output_x_.append(output)
                 y_.append(y_batch)
@@ -124,7 +130,7 @@ class RecorrentNeuralNetwork:
                 metric_s = f"{self.metric.__name__}: {metric:.4f}"
 
             # save loss and metric for each epoch
-            self.history[epoch] = {'loss': loss, 'metric': metric}
+            self.train_history[epoch] = {'loss': loss, 'metric': metric}
 
             if self.verbose:
                 print(f"Epoch {epoch}/{self.epochs} - loss: {loss:.4f} - {metric_s}")
@@ -139,7 +145,53 @@ class RecorrentNeuralNetwork:
 
                     if self._patience_counter >= self._patience:
                         print(f"Early stopping at epoch {epoch}")
-                        break
+                        break_val = True
+
+            if X_val is not None and y_val is not None:
+                # store mini-batch data for epoch loss and quality metrics calculation
+                val_output_x_ = []
+                val_y_ = []
+
+                for X_batch_val, y_batch_val in self.get_mini_batches(X_val, y_val):
+                    val_input_x = X_batch_val.reshape(X_batch_val.shape[0] // self._timestep, self._timestep, X_batch_val.shape[1])
+
+                    # Forward propagation
+                    val_output = self.forward_propagation(val_input_x, training=True)
+
+                    val_output_shape = val_output.shape
+
+                    val_output = val_output.reshape(val_output_shape[0] * val_output_shape[1], val_output_shape[2])
+
+                    # Backward propagation
+                    """
+                    error = self.loss.derivative(y_batch_val, output)
+
+                    error = error.reshape(output_shape[0], output_shape[1], output_shape[2])
+
+                    self.backward_propagation(error)
+                    """
+
+                    val_output = val_output.reshape(val_output.shape[0] * val_output.shape[1], 1)
+
+                    val_output_x_.append(val_output)
+                    val_y_.append(y_batch_val)
+
+                val_output_x_all = np.concatenate(val_output_x_)
+                val_y_all = np.concatenate(val_y_)
+
+                # compute loss
+                val_loss = self.loss.function(val_y_all, val_output_x_all)
+
+                val_metric = 'NA'
+
+                if self.metric is not None:
+                    val_metric = self.metric(val_y_all, val_output_x_all)
+
+                # save loss and metric for each epoch
+                self.validation_history[epoch] = {'loss': val_loss, 'metric': val_metric}
+
+            if break_val:
+                break
 
         return self
 
@@ -152,3 +204,37 @@ class RecorrentNeuralNetwork:
             raise ValueError("No metric specified for the neural network.")
 
         return self.metric(y, predictions)
+
+    def plot_train_curves(self):
+        epochs = self.epochs + 1
+
+        training_accuracy = [0] * epochs
+        validation_accuracy = [0] * epochs
+
+        training_loss = [0] * epochs
+        validation_loss = [0] * epochs
+
+        for i in range(1, self.epochs + 1):
+            training_accuracy[i] = self.train_history[i]['metric']
+            training_loss[i] = self.train_history[i]['loss']
+
+            validation_accuracy[i] = self.validation_history[i]['metric']
+            validation_loss[i] = self.validation_history[i]['loss']
+
+        epochs_range = np.arange(epochs)
+
+        plt.figure()
+        plt.plot(epochs_range, training_accuracy, 'r', label='Training', )
+        plt.plot(epochs_range, validation_accuracy, 'b', label='Validation')
+        plt.legend()
+        plt.xlabel('Epoch'), plt.ylabel('Accuracy')
+        plt.title('Accuracy curves')
+        plt.show()
+
+        plt.figure()
+        plt.plot(epochs_range, training_loss, 'r', label='Training', )
+        plt.plot(epochs_range, validation_loss, 'b', label='Validation')
+        plt.legend()
+        plt.xlabel('Epoch'), plt.ylabel('Loss')
+        plt.title('Loss curves')
+        plt.show()

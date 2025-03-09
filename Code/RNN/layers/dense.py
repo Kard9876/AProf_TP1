@@ -23,7 +23,7 @@ class DenseLayer(Layer):
     def initialize(self, optimizer):
         # initialize weights from a 0 centered uniform distribution [-0.5, 0.5)
         limit = 1 / np.sqrt(self._input_shape[1])
-        self.weights = np.random.uniform(-limit, limit, (self.input_shape()[0] // self._timestep, self.input_shape()[1], self.n_units))
+        self.weights = np.random.uniform(-limit, limit, (self.input_shape()[1], self.n_units))
 
         # initialize biases to 0
         self.biases = np.zeros((1, self.n_units))
@@ -44,7 +44,7 @@ class DenseLayer(Layer):
             timestep_output = np.dot(timestep_input, self.weights) + self.biases
             output_sequence.append(timestep_output)
 
-        return np.stack(output_sequence, axis=1).squeeze(-1)
+        return np.stack(output_sequence, axis=1)
 
     def backward_propagation(self, output_error, regulator=None):
         """
@@ -82,7 +82,12 @@ class DenseLayer(Layer):
             # Calculate gradients
             grad_weights += np.dot(timestep_input.T, timestep_grad)
             grad_biases += np.sum(timestep_grad, axis=0)
-            grad_input[:, t, :] = np.dot(timestep_grad, self.weights.T.squeeze(-1))
+            grad_input[:, t, :] = np.dot(timestep_grad, self.weights.T)
+
+            # Gradient Clipping (Optional but recommended)
+            np.clip(grad_weights, -1, 1, out=grad_weights)
+            np.clip(grad_biases, -1, 1, out=grad_biases)
+            np.clip(grad_input, -1, 1, out=grad_input)
 
         # Update weights and biases (using an optimizer)
         self.weights = self.w_opt.update(self.weights, grad_weights)

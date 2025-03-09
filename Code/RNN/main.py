@@ -1,3 +1,5 @@
+import numpy as np
+
 from layers.sigmoid import SigmoidActivation
 from functions.metrics import mse, accuracy
 from networks.recorrent_neural_network import RecorrentNeuralNetwork
@@ -6,11 +8,14 @@ from layers.rnn import RNN
 from layers.dense import DenseLayer
 from optimizations.retained_gradient import RetGradient
 from Code.DNN.optimizations.l2_reg import L2Reg
+from Code.RNN.functions.bce import BinaryCrossEntropy
+
 
 from Code.utils.dataset import Dataset
 
-
 def main():
+    np.random.seed(42)
+
     dataset = Dataset('../../Dataset/dataset_training_small.csv', '../../Dataset/dataset_validation_small.csv',
                       '../../Dataset/dataset_test_small.csv')
 
@@ -19,7 +24,7 @@ def main():
                                                                                         rem_punctuation=False)
 
     timestep = 2
-    batch_size = 6
+    batch_size = 8
 
     # network
     optimizer = RetGradient(learning_rate=0.01, momentum=0.90)
@@ -35,12 +40,14 @@ def main():
     net.add(SigmoidActivation())
 
     # train
-    net.fit(X_train, y_train)
+    net.fit(X_train, y_train, X_val=X_validation, y_val=y_validation)
 
     # test
     out = net.predict(X_test)
     out = out.reshape(out.shape[1], 1)
     print(net.score(y_test, out))
+
+    net.plot_train_curves()
 
 
 if __name__ == '__main__':

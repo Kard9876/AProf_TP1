@@ -3,6 +3,7 @@ import re
 
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class Dataset:
@@ -12,6 +13,8 @@ class Dataset:
         self._test_path = test_path
         self._vectorizer = CountVectorizer()
         self._vectorizer_fitted = False
+        self._tfidf_vectorizer = TfidfVectorizer()
+        self._tfidf_vectorizer_fitted = False
 
     def get_train_dataset(self, fit_column, target, sep=';', rem_punctuation=False):
         train = pd.read_csv(self._train_path, sep=sep)
