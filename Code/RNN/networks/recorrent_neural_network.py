@@ -160,7 +160,7 @@ class RecorrentNeuralNetwork:
 
                     val_output_shape = val_output.shape
 
-                    val_output = val_output.reshape(val_output_shape[0] * val_output_shape[1], val_output_shape[2])
+                    val_output = val_output.reshape(val_output_shape[0] * val_output_shape[1], 1)
 
                     # Backward propagation
                     """
@@ -170,8 +170,6 @@ class RecorrentNeuralNetwork:
 
                     self.backward_propagation(error)
                     """
-
-                    val_output = val_output.reshape(val_output.shape[0] * val_output.shape[1], 1)
 
                     val_output_x_.append(val_output)
                     val_y_.append(y_batch_val)

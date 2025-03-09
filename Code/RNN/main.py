@@ -9,9 +9,10 @@ from layers.dense import DenseLayer
 from optimizations.retained_gradient import RetGradient
 from Code.DNN.optimizations.l2_reg import L2Reg
 from Code.RNN.functions.bce import BinaryCrossEntropy
-
+from Code.RNN.layers.relu import ReLUActivation
 
 from Code.utils.dataset import Dataset
+
 
 def main():
     np.random.seed(42)
@@ -27,8 +28,8 @@ def main():
     batch_size = 8
 
     # network
-    optimizer = RetGradient(learning_rate=0.01, momentum=0.90)
-    loss = MeanSquaredError()
+    optimizer = RetGradient(learning_rate=0.005, momentum=0.90)
+    loss = BinaryCrossEntropy()
 
     regulator = L2Reg(l2_val=0.001)
     net = RecorrentNeuralNetwork(epochs=3, batch_size=batch_size, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
