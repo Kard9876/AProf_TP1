@@ -7,7 +7,9 @@ from Code.LogisticRegression.utils.sigmoid import sigmoid
 class LogisticRegression:
     def __init__(self, n_features):
         self._n_features = n_features
-        self.theta = np.zeros(n_features)
+        # self.theta = np.zeros(n_features)
+        limit = 1 / np.sqrt(n_features)
+        self.theta = np.random.uniform(-limit, limit, n_features)
 
     def probability(self, instance):
         x = np.empty([self._n_features])
@@ -26,6 +28,10 @@ class LogisticRegression:
             res = 1
 
         return res
+
+    def predict_many(self, X):
+        p = sigmoid(np.dot(X, self.theta))
+        return np.where(p >= 0.5, 1, 0)
 
     def cost_function(self, X, y, theta=None):
         if theta is None:
@@ -48,7 +54,7 @@ class LogisticRegression:
         for its in range(iters):
             J = self.cost_function(X, y)
 
-            if its % 1000 == 0:
+            if its % 10 == 0:
                 print(J)
 
             delta = X.T.dot(sigmoid(X.dot(self.theta)) - y)
