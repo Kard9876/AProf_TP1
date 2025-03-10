@@ -14,6 +14,7 @@ from Code.DNN.optimizations.l2_reg import L2Reg
 from Code.DNN.functions.bce import BinaryCrossEntropy
 
 from Code.utils.dataset import Dataset
+import Code.utils.store_model as store_model
 
 
 def main(args):
@@ -35,7 +36,7 @@ def main(args):
     loss = BinaryCrossEntropy()
 
     regulator = L2Reg(l2_val=0.001)
-    net = NeuralNetwork(epochs=15, batch_size=16, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
+    net = NeuralNetwork(epochs=3, batch_size=16, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
                         metric=accuracy, patience=2, min_delta=0.001)
 
     n_features = X_train.shape[1]
@@ -63,6 +64,41 @@ def main(args):
     results = dataset.merge_results(ids, out)
     results.to_csv(store_results, sep='\t', index=False)
 
+    store_model.store_model('./Model/dnn', 'dnn', net)
+
+
+def main2(args):
+    np.random.seed(42)
+
+    dataset = Dataset('../../Dataset/DatasetsGerados/dataset_training_input.csv',
+                      '../../Dataset/DatasetsGerados/dataset_training_output.csv',
+                      '../../Dataset/DatasetsGerados/dataset_validation_input.csv',
+                      '../../Dataset/DatasetsGerados/dataset_validation_output.csv',
+                      '../../Dataset/DatasetsGerados/dataset_test_input.csv',
+                      '../../Dataset/DatasetsGerados/dataset_test_output.csv')
+
+    # Remover pontuação deu pior resultado
+    X_train, y_train, X_validation, y_validation, X_test, y_test, ids = dataset.get_datasets('Text', 'Label', sep='\t',
+                                                                                             rem_punctuation=False)
+
+    net = store_model.retrieve_model('./Model/dnn', 'dnn')
+
+    # test
+    out = net.predict(X_test)
+    net.plot_train_curves()
+
+    if y_test is not None:
+        print(net.score(y_test, out))
+
+    store_results = args[1] if len(args) > 1 else './Results/dnn_results2.csv'
+
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(store_results), exist_ok=True)
+
+    results = dataset.merge_results(ids, out)
+    results.to_csv(store_results, sep='\t', index=False)
+
 
 if __name__ == '__main__':
     main(sys.argv)
+    main2(sys.argv)
