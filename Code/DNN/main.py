@@ -36,7 +36,7 @@ def main(args):
     loss = BinaryCrossEntropy()
 
     regulator = L2Reg(l2_val=0.001)
-    net = NeuralNetwork(epochs=3, batch_size=16, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
+    net = NeuralNetwork(epochs=15, batch_size=16, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
                         metric=accuracy, patience=2, min_delta=0.001)
 
     n_features = X_train.shape[1]
