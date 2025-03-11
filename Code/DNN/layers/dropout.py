@@ -47,6 +47,7 @@ class DropOutLayer(Layer):
     def forward_propagation(self, inputs, training):
         self.input = inputs
 
+        # TODO talvez tenha de guardar esta matriz para a usar na backpropagation
         weights = self._dropout()
         self.output = np.dot(self.input, weights) + self.biases
         return self.output
