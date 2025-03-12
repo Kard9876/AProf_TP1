@@ -31,6 +31,8 @@ class NeuralNetwork:
         self._min_delta = min_delta
         self._best_loss = math.inf
 
+        self._real_epochs  = 0
+
     def add(self, layer):
         if self.layers:
             layer.set_input_shape(input_shape=self.layers[-1].output_shape())
@@ -80,8 +82,11 @@ class NeuralNetwork:
         self.validation_history = {}
 
         break_val = False
+        self._real_epochs = 0
 
         for epoch in range(1, self.epochs + 1):
+            self._real_epochs += 1
+
             # store mini-batch data for epoch loss and quality metrics calculation
             output_x_ = []
             y_ = []
@@ -177,7 +182,7 @@ class NeuralNetwork:
         return self.metric(y, predictions)
 
     def plot_train_curves(self):
-        epochs = self.epochs + 1
+        epochs = self._real_epochs + 1
 
         training_accuracy = [0] * epochs
         validation_accuracy = [0] * epochs
@@ -185,7 +190,7 @@ class NeuralNetwork:
         training_loss = [0] * epochs
         validation_loss = [0] * epochs
 
-        for i in range(1, self.epochs + 1):
+        for i in range(1, self._real_epochs + 1):
             training_accuracy[i] = self.train_history[i]['metric']
             training_loss[i] = self.train_history[i]['loss']
 
