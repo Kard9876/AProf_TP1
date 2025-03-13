@@ -23,6 +23,10 @@ class Dataset:
         self._label_encoder = LabelEncoder()
         self._label_encoder_fitted = False
 
+    def set_dataset_test(self, test_input, test_output):
+        self._test_input = test_input
+        self._test_output = test_output
+
     def get_train_dataset(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID'):
         X_train = pd.read_csv(self._train_input, sep=sep)
         X_train = X_train.drop(id_column, inplace=False, axis=1)
