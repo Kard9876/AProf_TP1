@@ -136,25 +136,9 @@ class NeuralNetwork:
 
             if X_val is not None and y_val is not None:
                 # store mini-batch data for epoch loss and quality metrics calculation
-                val_output_x_ = []
-                val_y_ = []
 
-                for val_X_batch, val_y_batch in self.get_mini_batches(X_val, y_val):
-                    # Forward propagation
-                    val_output = self.forward_propagation(val_X_batch, training=True)
-
-                    """
-                    # Backward propagation
-                    val_error = self.loss.derivative(val_y_batch, val_output)
-
-                    self.backward_propagation(val_error)
-                    """
-
-                    val_output_x_.append(val_output)
-                    val_y_.append(val_y_batch)
-
-                val_output_x_all = np.concatenate(val_output_x_)
-                val_y_all = np.concatenate(val_y_)
+                val_output_x_all = self.forward_propagation(X_val, training=False)
+                val_y_all = y_val
 
                 # compute loss
                 val_loss = self.loss.function(val_y_all, val_output_x_all)
