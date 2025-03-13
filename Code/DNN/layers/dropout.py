@@ -20,6 +20,8 @@ class DropOutLayer(Layer):
         self.weights = None
         self.biases = None
 
+        self._tmp_weights = None
+
     def initialize(self, optimizer):
         # initialize weights from a 0 centered uniform distribution [-0.5, 0.5)
         self.weights = np.random.rand(self.input_shape()[0], self.n_units) - 0.5
@@ -34,7 +36,10 @@ class DropOutLayer(Layer):
         return np.prod(self.weights.shape) + np.prod(self.biases.shape)
 
     # Implementation based of https://d2l.ai/chapter_multilayer-perceptrons/dropout.html
-    def _dropout(self):
+    def _dropout(self, training):
+        if not training:
+            return self.weights
+
         m = self.weights.shape[0]
         n = self.weights.shape[1]
 
@@ -47,19 +52,18 @@ class DropOutLayer(Layer):
     def forward_propagation(self, inputs, training):
         self.input = inputs
 
-        # TODO talvez tenha de guardar esta matriz para a usar na backpropagation
-        weights = self._dropout()
-        self.output = np.dot(self.input, weights) + self.biases
+        self._tmp_weights = self._dropout(training)
+        self.output = np.dot(self.input, self._tmp_weights) + self.biases
         return self.output
 
     def backward_propagation(self, output_error, regulator=None):
         # computes the layer input error (the output error from the previous layer),
         # dE/dX, to pass on to the previous layer
         # SHAPES: (batch_size, input_columns) = (batch_size, output_columns) * (output_columns, input_columns)
-        input_error = np.dot(output_error, self.weights.T)  # dE / dY = output error
+        input_error = np.dot(output_error, self._tmp_weights.T)  # dE / dY = output error
 
         if regulator is not None:
-            input_error += regulator.update(self.input.shape[0], self.weights)
+            input_error += regulator.update(self.input.shape[0], self._tmp_weights)
 
         # computes the weight error: dE/dW = X.T * dE/dY
         # SHAPES: (input_columns, output_columns) = (input_columns, batch_size) * (batch_size, output_columns)
