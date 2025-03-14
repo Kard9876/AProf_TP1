@@ -9,7 +9,7 @@ data_set.csv = https://www.kaggle.com/datasets/heleneeriksen/gpt-vs-human-a-corp
 """
 
 "Se adicionarem dataset na linha adicionar fun posicaoDataset (adicionar no inicio)"
-listaDatasets = ["data_set.csv","model_training_dataset.csv"]
+listaDatasets = ["output.csv"]
 
 try:
     mkdir("./DatasetsGerados")
@@ -24,7 +24,7 @@ datasetTraining_output = "./DatasetsGerados/dataset_training_output.csv"
 datasetValidation_output = "./DatasetsGerados/dataset_validation_output.csv"
 datasetTest_output = "./DatasetsGerados/dataset_test_output.csv"
 
-sizeDTrain = 4000
+sizeDTrain = 10000
 sizeDVal = 1000
 sizeDTest = 1000
 
@@ -47,11 +47,15 @@ def posicaoDataset(nome_dataset):
     return 1,None,3
     """
 
+
     if nome_dataset == "data_set.csv":
         return 1, None, 3
 
     elif nome_dataset == "model_training_dataset.csv":
         return 1, 2, None
+
+    elif nome_dataset == "output.csv":
+        return 1 ,2, None
 
     else:
         print("Alguem esqueçeu-se de adicionar o dataset na função posicaoDataset")
@@ -98,8 +102,7 @@ def createdatasets():
     return fd1, fd2, fd3, fd4, fd5, fd6
 
 def clearText(texto):
-    texto = re.sub(";", ".", texto)
-    texto.upper() #TODO se for necessario.
+    texto.upper()
     return re.sub("\n", '', texto)
 
 
