@@ -9,7 +9,7 @@ data_set.csv = https://www.kaggle.com/datasets/heleneeriksen/gpt-vs-human-a-corp
 """
 
 "Se adicionarem dataset na linha adicionar fun posicaoDataset (adicionar no inicio)"
-listaDatasets = ["output.csv"]
+listaDatasets = ["model_training_dataset.csv"]
 
 try:
     mkdir("./DatasetsGerados")
@@ -24,7 +24,7 @@ datasetTraining_output = "./DatasetsGerados/dataset_training_output.csv"
 datasetValidation_output = "./DatasetsGerados/dataset_validation_output.csv"
 datasetTest_output = "./DatasetsGerados/dataset_test_output.csv"
 
-sizeDTrain = 10000
+sizeDTrain = 4000
 sizeDVal = 1000
 sizeDTest = 1000
 
@@ -47,15 +47,11 @@ def posicaoDataset(nome_dataset):
     return 1,None,3
     """
 
-
     if nome_dataset == "data_set.csv":
         return 1, None, 3
 
     elif nome_dataset == "model_training_dataset.csv":
         return 1, 2, None
-
-    elif nome_dataset == "output.csv":
-        return 1 ,2, None
 
     else:
         print("Alguem esqueçeu-se de adicionar o dataset na função posicaoDataset")
@@ -63,7 +59,7 @@ def posicaoDataset(nome_dataset):
 
 #fixme verificar todos os casos
 def is_ai_generator(text):
-    return "AI" if str(text).upper == "TRUE" or str(text) == "1" or str(text).upper() == "AI" or str(text).upper() =="YES" else "HUMAN"
+    return "AI" if str(text).upper == "TRUE" or str(text) == "1" or str(text).upper() == "AI" or str(text).upper() =="YES" else "Human"
 
 def updatedatasets(fd1,fd2,fd3,fd4,fd5,fd6):
     writerTraining_input = csv.writer(fd1, delimiter='\t')
@@ -102,7 +98,8 @@ def createdatasets():
     return fd1, fd2, fd3, fd4, fd5, fd6
 
 def clearText(texto):
-    texto.upper()
+    texto = re.sub(";", ".", texto)
+    texto.upper() #TODO se for necessario.
     return re.sub("\n", '', texto)
 
 
@@ -145,7 +142,7 @@ for dataset in listaDatasets:
                         if pos_texto2 is not None:
                             idTest += 1
                             writerTest_i.writerow([f"D1-{idTest}", f"{clearText(row[pos_texto])}"])
-                            writerTest_o.writerow([f"D1-{idTest}", "HUMAN"])
+                            writerTest_o.writerow([f"D1-{idTest}", "Human"])
 
                             idTest += 1
                             writerTest_i.writerow([f"D1-{idTest}", f"{clearText(row[pos_texto2])}"])
@@ -165,7 +162,7 @@ for dataset in listaDatasets:
                         if pos_texto2 is not None:
                             idTrain += 1
                             writerTraining_i.writerow([f"D1-{idTrain}", f"{clearText(row[pos_texto])}"])
-                            writerTraining_o.writerow([f"D1-{idTrain}", "HUMAN"])
+                            writerTraining_o.writerow([f"D1-{idTrain}", "Human"])
 
                             idTrain += 1
                             writerTraining_i.writerow([f"D1-{idTrain}", f"{clearText(row[pos_texto2])}"])
@@ -184,7 +181,7 @@ for dataset in listaDatasets:
                         if pos_texto2 is not None:
                             idVal += 1
                             writerValidation_i.writerow([f"D1-{idVal}", f"{clearText(row[pos_texto])}"])
-                            writerValidation_o.writerow([f"D1-{idVal}", "HUMAN"])
+                            writerValidation_o.writerow([f"D1-{idVal}", "Human"])
 
                             idVal += 1
                             writerValidation_i.writerow([f"D1-{idVal}", f"{clearText(row[pos_texto2])}"])

@@ -31,6 +31,8 @@ class NeuralNetwork:
         self._min_delta = min_delta
         self._best_loss = math.inf
 
+        self._real_epochs  = 0
+
     def add(self, layer):
         if self.layers:
             layer.set_input_shape(input_shape=self.layers[-1].output_shape())
@@ -80,8 +82,11 @@ class NeuralNetwork:
         self.validation_history = {}
 
         break_val = False
+        self._real_epochs = 0
 
         for epoch in range(1, self.epochs + 1):
+            self._real_epochs += 1
+
             # store mini-batch data for epoch loss and quality metrics calculation
             output_x_ = []
             y_ = []
@@ -131,25 +136,9 @@ class NeuralNetwork:
 
             if X_val is not None and y_val is not None:
                 # store mini-batch data for epoch loss and quality metrics calculation
-                val_output_x_ = []
-                val_y_ = []
 
-                for val_X_batch, val_y_batch in self.get_mini_batches(X_val, y_val):
-                    # Forward propagation
-                    val_output = self.forward_propagation(val_X_batch, training=True)
-
-                    """
-                    # Backward propagation
-                    val_error = self.loss.derivative(val_y_batch, val_output)
-
-                    self.backward_propagation(val_error)
-                    """
-
-                    val_output_x_.append(val_output)
-                    val_y_.append(val_y_batch)
-
-                val_output_x_all = np.concatenate(val_output_x_)
-                val_y_all = np.concatenate(val_y_)
+                val_output_x_all = self.forward_propagation(X_val, training=False)
+                val_y_all = y_val
 
                 # compute loss
                 val_loss = self.loss.function(val_y_all, val_output_x_all)
@@ -177,7 +166,7 @@ class NeuralNetwork:
         return self.metric(y, predictions)
 
     def plot_train_curves(self):
-        epochs = self.epochs + 1
+        epochs = self._real_epochs + 1
 
         training_accuracy = [0] * epochs
         validation_accuracy = [0] * epochs
@@ -185,7 +174,7 @@ class NeuralNetwork:
         training_loss = [0] * epochs
         validation_loss = [0] * epochs
 
-        for i in range(1, self.epochs + 1):
+        for i in range(1, self._real_epochs + 1):
             training_accuracy[i] = self.train_history[i]['metric']
             training_loss[i] = self.train_history[i]['loss']
 
