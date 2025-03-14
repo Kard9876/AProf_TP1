@@ -2,7 +2,7 @@ import csv
 import requests
 
 # Defina sua chave da API DeepInfra
-API_KEY = "ko0ZabTrSHhcgzohpVPMAioc7GnoW92Y"
+API_KEY = ""
 
 # URL da API
 url = "https://api.deepinfra.com/v1/openai/chat/completions"
@@ -19,7 +19,7 @@ with open(nome_arquivo, mode="w", newline="", encoding="utf-8") as arquivo:
     fd.writerow(cabecalho)
 
     for i in range(1,10000):
-        prompt = "Write a text Escreva um texto simples continuous with approximately 100 to 120 words on a topic related to physics. The text must be direct, without subdivisions, topics or detailed explanations, just a fluid paragraph."
+        prompt = "Write a text Escreva um texto simples continuous with approximately 100 to 120 words on a topic related to biology. The text must be direct, without subdivisions, topics or detailed explanations, just a fluid paragraph."
 
         # Configuração da requisição
         headers = {
