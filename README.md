@@ -18,4 +18,6 @@
 
 - Numpy
 - Pandas
-- Scikit-learn (usado para implementar bag of words)
+- Scikit-learn (usado para pre-processar os dados)
+- nltk
+- gensim

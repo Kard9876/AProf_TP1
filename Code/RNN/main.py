@@ -27,8 +27,7 @@ def main(args):
                       '../../Dataset/DatasetsGerados/dataset_test_output.csv')
 
     # Remover pontuação deu pior resultado
-    X_train, y_train, X_validation, y_validation, X_test, y_test, ids = dataset.get_datasets('Text', 'Label', sep='\t',
-                                                                                             rem_punctuation=False)
+    X_train, y_train, X_validation, y_validation, X_test, y_test, ids = dataset.get_dataset_embedding('Text', 'Label', sep='\t', rem_punctuation=False)
 
     timestep = 2
     batch_size = 8
