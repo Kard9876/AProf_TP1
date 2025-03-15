@@ -27,22 +27,21 @@ def main(args):
                       '../../Dataset/DatasetsGerados/dataset_test_output.csv')
 
     # Remover pontuação deu pior resultado
-    X_train, y_train, X_validation, y_validation, X_test, y_test, ids = dataset.get_dataset_embedding('Text', 'Label', sep='\t', rem_punctuation=False)
+    X_train, y_train, X_validation, y_validation, X_test, y_test, ids = dataset.get_dataset_embedding('Text', 'Label', sep='\t', rem_punctuation=False, vector_size=100, words_phrase=100)
 
-    timestep = 2
     batch_size = 8
 
     # network
-    optimizer = RetGradient(learning_rate=0.005, momentum=0.90)
+    optimizer = RetGradient(learning_rate=0.001, momentum=0.85)
     loss = BinaryCrossEntropy()
 
-    regulator = L2Reg(l2_val=0.001)
-    net = RecorrentNeuralNetwork(epochs=3, batch_size=batch_size, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
-                        metric=accuracy, patience=2, min_delta=0.001, timestep=timestep)
+    regulator = None # L2Reg(l2_val=0.001)
+    net = RecorrentNeuralNetwork(epochs=6, batch_size=batch_size, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
+                        metric=accuracy, patience=-1, min_delta=0.001)
 
-    net.add(RNN(5, input_shape=(timestep, X_train.shape[1])))
+    net.add(RNN(10, input_shape=(X_train.shape[1], X_train.shape[2])))
     net.add(SigmoidActivation())
-    net.add(DenseLayer(1, timestep))
+    net.add(DenseLayer(1))
     net.add(SigmoidActivation())
 
     # train
@@ -50,7 +49,6 @@ def main(args):
 
     # test
     out = net.predict(X_test)
-    out = out.reshape(out.shape[1], 1)
 
     if y_test is not None:
         print(net.score(y_test, out))

@@ -12,9 +12,7 @@ matplotlib.use('TkAgg')
 
 class RecorrentNeuralNetwork:
     def __init__(self, epochs=100, batch_size=128, optimizer=None, regulator=None, verbose=False, loss=MeanSquaredError(),
-                 metric: callable = mse, patience=-1, min_delta=0.001, timestep=2):
-
-        assert batch_size % timestep == 0, "Batch size should be divisable by timestep"
+                 metric: callable = mse, patience=-1, min_delta=0.001):
 
         self.epochs = epochs
         self.batch_size = batch_size
@@ -23,7 +21,6 @@ class RecorrentNeuralNetwork:
         self.loss = loss
         self.metric = metric
         self._regulator = regulator
-        self._timestep = timestep
 
         # attributes
         self.layers = []
@@ -46,7 +43,7 @@ class RecorrentNeuralNetwork:
         self.layers.append(layer)
         return self
 
-    def get_mini_batches(self, X, y=None, shuffle=True):
+    def get_mini_batches(self, X, y=None, shuffle=False):
         n_samples = X.shape[0]
         indices = np.arange(n_samples)
         assert self.batch_size <= n_samples, "Batch size cannot be greater than the number of samples"
@@ -84,9 +81,6 @@ class RecorrentNeuralNetwork:
         if np.ndim(y) == 1:
             y = np.expand_dims(y, axis=1)
 
-        assert X.shape[0] % self.batch_size == 0, "X's number of rows should be divisible by batch_size"
-        assert X_val is None or X_val.shape[0] % self.batch_size == 0, "X's number of rows should be divisible by batch_size"
-
         break_val = False
 
         self.train_history = {}
@@ -97,19 +91,11 @@ class RecorrentNeuralNetwork:
             y_ = []
 
             for X_batch, y_batch in self.get_mini_batches(X, y):
-                input_x = X_batch.reshape(X_batch.shape[0] // self._timestep, self._timestep, X_batch.shape[1])
-
                 # Forward propagation
-                output = self.forward_propagation(input_x, training=True)
-
-                output_shape = output.shape
-
-                output = output.reshape(output_shape[0] * output_shape[1], 1)
+                output = self.forward_propagation(X_batch, training=True)
 
                 # Backward propagation
                 error = self.loss.derivative(y_batch, output)
-
-                error = error.reshape(output_shape[0], output_shape[1], output_shape[2])
 
                 self.backward_propagation(error)
 
@@ -152,27 +138,9 @@ class RecorrentNeuralNetwork:
                 val_output_x_ = []
                 val_y_ = []
 
-                for X_batch_val, y_batch_val in self.get_mini_batches(X_val, y_val):
-                    val_input_x = X_batch_val.reshape(X_batch_val.shape[0] // self._timestep, self._timestep, X_batch_val.shape[1])
-
-                    # Forward propagation
-                    val_output = self.forward_propagation(val_input_x, training=True)
-
-                    val_output_shape = val_output.shape
-
-                    val_output = val_output.reshape(val_output_shape[0] * val_output_shape[1], 1)
-
-                    # Backward propagation
-                    """
-                    error = self.loss.derivative(y_batch_val, output)
-
-                    error = error.reshape(output_shape[0], output_shape[1], output_shape[2])
-
-                    self.backward_propagation(error)
-                    """
-
-                    val_output_x_.append(val_output)
-                    val_y_.append(y_batch_val)
+                val_output = self.forward_propagation(X_val, training=False)
+                val_output_x_.append(val_output)
+                val_y_.append(y_val)
 
                 val_output_x_all = np.concatenate(val_output_x_)
                 val_y_all = np.concatenate(val_y_)
@@ -194,7 +162,6 @@ class RecorrentNeuralNetwork:
         return self
 
     def predict(self, X):
-        X = X.reshape(1, X.shape[0], X.shape[1])
         return self.forward_propagation(X, training=False)
 
     def score(self, y, predictions):
@@ -204,7 +171,7 @@ class RecorrentNeuralNetwork:
         return self.metric(y, predictions)
 
     def plot_train_curves(self):
-        epochs = self.epochs + 1
+        epochs = len(self.train_history.keys())
 
         training_accuracy = [0] * epochs
         validation_accuracy = [0] * epochs
@@ -212,12 +179,12 @@ class RecorrentNeuralNetwork:
         training_loss = [0] * epochs
         validation_loss = [0] * epochs
 
-        for i in range(1, self.epochs + 1):
-            training_accuracy[i] = self.train_history[i]['metric']
-            training_loss[i] = self.train_history[i]['loss']
+        for i in range(1, epochs + 1):
+            training_accuracy[i-1] = self.train_history[i]['metric']
+            training_loss[i-1] = self.train_history[i]['loss']
 
-            validation_accuracy[i] = self.validation_history[i]['metric']
-            validation_loss[i] = self.validation_history[i]['loss']
+            validation_accuracy[i-1] = self.validation_history[i]['metric']
+            validation_loss[i-1] = self.validation_history[i]['loss']
 
         epochs_range = np.arange(epochs)
 

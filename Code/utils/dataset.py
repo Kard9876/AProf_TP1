@@ -1,18 +1,14 @@
 import string
-import re
-from idlelib.autocomplete import TRY_A
 
 import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
-from sklearn.decomposition import PCA
 
 from gensim.models import Word2Vec
 import gensim
-from nltk.tokenize import sent_tokenize, word_tokenize
-from gensim.test.utils import common_texts
+from nltk.tokenize import word_tokenize
 
 class Dataset:
     def __init__(self, train_input, train_output, validation_input, validation_output, test_input, test_output):
@@ -208,7 +204,7 @@ class Dataset:
             data.append(word_tokenize(text.lower()))
 
         if self._w2v_model is None:
-            self._w2v_model = gensim.models.Word2Vec(sentences=data, min_count=1, vector_size=vector_size)
+            self._w2v_model = gensim.models.Word2Vec(sentences=data, min_count=1, vector_size=vector_size, workers=1, seed=42)
             self._vector_size = vector_size
             self._words_phrase = words_phrase
 
@@ -235,7 +231,7 @@ class Dataset:
 
                 try:
                     temp.append(self._w2v_model.wv[word])
-                except Exception as e:
+                except KeyError:
                     temp.append(np.zeros(self._vector_size))
 
             if len(words) < self._words_phrase:
