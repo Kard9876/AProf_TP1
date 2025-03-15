@@ -7,9 +7,11 @@ from Code.LogisticRegression.utils.sigmoid import sigmoid
 
 
 class LogisticRegression:
-    def __init__(self, n_features):
+    def __init__(self, n_features, reg_type=None, reg_lambda=0.0):
         self._n_features = n_features
         # self.theta = np.zeros(n_features)
+        self.reg_type = reg_type
+        self.reg_lambda = reg_lambda
         limit = 1 / np.sqrt(n_features)
         self.theta = np.random.uniform(-limit, limit, n_features)
 
@@ -41,14 +43,18 @@ class LogisticRegression:
     def cost_function(self, X, y, theta=None):
         if theta is None:
             theta = self.theta
-
         m = X.shape[0]
         p = sigmoid(np.dot(X, theta))
+        cost = (-y * np.log(p) - (1 - y) * np.log(1 - p)).mean()  # Equivalent to sum / m
 
-        cost = (-y * np.log(p) - (1 - y) * np.log(1 - p))
-        res = np.sum(cost) / m
+        if self.reg_type == 'l2':
+            reg_term = (self.reg_lambda / (2 * m)) * np.sum(theta[1:] ** 2)
+            cost += reg_term
+        elif self.reg_type == 'l1':
+            reg_term = (self.reg_lambda / m) * np.sum(np.abs(theta[1:]))
+            cost += reg_term
 
-        return res
+        return cost
 
     def gradient_descent(self, X, y, X_val, y_val, alpha=0.01, iters=10000):
         m = X.shape[0]
