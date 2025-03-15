@@ -9,4 +9,4 @@ class L2Reg(Regulator):
         self._val = l2_val
 
     def update(self, n, w):
-        return (self._val/(2*n)) * np.sum(np.pow(w, 2))
+        return (self._val/(2*n)) * np.sum(w ** 2)
