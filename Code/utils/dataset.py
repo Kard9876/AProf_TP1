@@ -56,7 +56,7 @@ class Dataset:
 
         return X_train, y_train
 
-    def get_validation_dataset(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID'):
+    def get_validation_dataset(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID', rem_first_phrase=False):
         if not self._vectorizer_fitted or not self._label_encoder_fitted:
             raise Exception("Please obtain train dataset first")
 
@@ -65,6 +65,9 @@ class Dataset:
 
         if rem_punctuation:
             X_validation[fit_column] = X_validation[fit_column].apply(remove_ponctuation)
+
+        if rem_first_phrase:
+            X_validation[fit_column] = self._remove_first_phrase(X_validation[fit_column])
 
         X_validation = self._vectorizer.transform(X_validation[fit_column]).toarray()
 
@@ -76,7 +79,7 @@ class Dataset:
 
         return X_validation, y_validation
 
-    def get_test_dataset(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID'):
+    def get_test_dataset(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID', rem_first_phrase=False):
         if not self._vectorizer_fitted or not self._label_encoder_fitted:
             raise Exception("Please obtain train dataset first")
 
@@ -87,7 +90,8 @@ class Dataset:
         if rem_punctuation:
             X_test[fit_column] = X_test[fit_column].apply(remove_ponctuation)
 
-        X_test[fit_column] = self._remove_first_phrase(X_test[fit_column])
+        if rem_first_phrase:
+            X_test[fit_column] = self._remove_first_phrase(X_test[fit_column])
 
         X_test = self._vectorizer.transform(X_test[fit_column]).toarray()
 
@@ -115,8 +119,8 @@ class Dataset:
 
     def get_datasets(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID', rem_first_phrase=False):
         X_train, y_train = self.get_train_dataset(fit_column, target, sep=sep, rem_punctuation=rem_punctuation, id_column=id_column, rem_first_phrase=rem_first_phrase)
-        X_validation, y_validation = self.get_validation_dataset(fit_column, target, sep=sep, rem_punctuation=rem_punctuation, id_column=id_column)
-        X_test, y_test, ids = self.get_test_dataset(fit_column, target, sep=sep, rem_punctuation=rem_punctuation, id_column=id_column)
+        X_validation, y_validation = self.get_validation_dataset(fit_column, target, sep=sep, rem_punctuation=rem_punctuation, id_column=id_column, rem_first_phrase=rem_first_phrase)
+        X_test, y_test, ids = self.get_test_dataset(fit_column, target, sep=sep, rem_punctuation=rem_punctuation, id_column=id_column, rem_first_phrase=rem_first_phrase)
 
         return X_train, y_train, X_validation, y_validation, X_test, y_test, ids
 
