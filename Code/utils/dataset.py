@@ -32,12 +32,15 @@ class Dataset:
         self._test_input = test_input
         self._test_output = test_output
 
-    def get_train_dataset(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID'):
+    def get_train_dataset(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID', rem_first_phrase=False):
         X_train = pd.read_csv(self._train_input, sep=sep)
         X_train = X_train.drop(id_column, inplace=False, axis=1)
 
         if rem_punctuation:
             X_train[fit_column] = X_train[fit_column].apply(remove_ponctuation)
+
+        if rem_first_phrase:
+             X_train[fit_column] = self._remove_first_phrase(X_train[fit_column])
 
         self._vectorizer.fit(X_train[fit_column])
         self._vectorizer_fitted = True
@@ -84,6 +87,8 @@ class Dataset:
         if rem_punctuation:
             X_test[fit_column] = X_test[fit_column].apply(remove_ponctuation)
 
+        X_test[fit_column] = self._remove_first_phrase(X_test[fit_column])
+
         X_test = self._vectorizer.transform(X_test[fit_column]).toarray()
 
         y_test = None
@@ -98,8 +103,18 @@ class Dataset:
 
         return X_test, y_test, ids
 
-    def get_datasets(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID'):
-        X_train, y_train = self.get_train_dataset(fit_column, target, sep=sep, rem_punctuation=rem_punctuation, id_column=id_column)
+    def _remove_first_phrase(self, dataset):
+        modified_dataset = []
+
+        for row in dataset:
+            row_str = str(row)
+            modified_row = ".".join(row_str.split(".")[1:])
+            modified_dataset.append(modified_row)
+
+        return modified_dataset
+
+    def get_datasets(self, fit_column, target, sep=';', rem_punctuation=False, id_column='ID', rem_first_phrase=False):
+        X_train, y_train = self.get_train_dataset(fit_column, target, sep=sep, rem_punctuation=rem_punctuation, id_column=id_column, rem_first_phrase=rem_first_phrase)
         X_validation, y_validation = self.get_validation_dataset(fit_column, target, sep=sep, rem_punctuation=rem_punctuation, id_column=id_column)
         X_test, y_test, ids = self.get_test_dataset(fit_column, target, sep=sep, rem_punctuation=rem_punctuation, id_column=id_column)
 
