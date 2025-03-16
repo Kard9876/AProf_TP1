@@ -10,7 +10,6 @@ from itertools import product
 from Code.RNN.networks.recorrent_neural_network import RecorrentNeuralNetwork
 from layers.sigmoid import SigmoidActivation
 from functions.metrics import mse, accuracy
-from Code.RNN.networks import recorrent_neural_network
 from functions.mse import MeanSquaredError
 from layers.rnn import RNN
 from layers.dense import DenseLayer
@@ -41,7 +40,7 @@ def build_and_train_network(X_train, y_train, X_val, y_val, X_test, y_test, para
 
     # Topologia
     net.add(RNN(params['rnn_units'], input_shape=(X_train.shape[1], X_train.shape[2])))
-    net.add(ReLUActivation())  # Apenas ReLU
+    net.add(ReLUActivation())
 
     net.add(DenseLayer(1))
     net.add(SigmoidActivation())
@@ -57,12 +56,12 @@ def build_and_train_network(X_train, y_train, X_val, y_val, X_test, y_test, para
 def grid_search(X_train, y_train, X_val, y_val, X_test, y_test):
     # Hiperparamentros para alterar
     param_grid = {
-        'rnn_units': [8, 10],              # melhor 10
-        'batch_size': [8, 6],              # melhor 8
-        'learning_rate': [0.001, 0.005],     # melhor 0.01
-        'momentum': [0.9, 0.95],            # melhor 0,9
-        'l2_val': [0.01, 0.015],              # melhor 0.01
-        'epochs': [8, 10]                   # melhor 10
+        'rnn_units': [10],              # melhor 10
+        'batch_size': [8],              # melhor 8
+        'learning_rate': [0.001],     # melhor 0.001
+        'momentum': [0.9],            # melhor 0,9
+        'l2_val': [0.01],              # melhor 0.01
+        'epochs': [10]                   # melhor 10
     }
 
     # Fazer as combinações e testar combinações
