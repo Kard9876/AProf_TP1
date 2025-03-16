@@ -10,6 +10,9 @@ from gensim.models import Word2Vec
 import gensim
 from nltk.tokenize import word_tokenize
 
+import nltk
+nltk.download('punkt')
+
 class Dataset:
     def __init__(self, train_input, train_output, validation_input, validation_output, test_input, test_output):
         self._train_input = train_input
