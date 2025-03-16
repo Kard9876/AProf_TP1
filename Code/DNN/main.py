@@ -24,25 +24,27 @@ def main(args):
                       '../../Dataset/DatasetsGerados/dataset_training_output.csv',
                       '../../Dataset/DatasetsGerados/dataset_validation_input.csv',
                       '../../Dataset/DatasetsGerados/dataset_validation_output.csv',
-                      '../../Dataset/DatasetsGerados/dataset_test_input.csv',
-                      '../../Dataset/DatasetsGerados/dataset_test_output.csv')
+                      '../../Dataset/DatasetsGerados/dataset1_inputs.csv',
+                      '../../Dataset/DatasetsGerados/dataset1_outputs.csv')
 
     # Remover pontuação deu pior resultado
     X_train, y_train, X_validation, y_validation, X_test, y_test, ids = dataset.get_datasets('Text', 'Label', sep='\t',
                                                                                              rem_punctuation=False)
 
     # network
-    optimizer = RetGradient(learning_rate=0.01, momentum=0.90)
+    optimizer = RetGradient(learning_rate=0.0034, momentum=0.65)
     loss = BinaryCrossEntropy()
 
-    regulator = L2Reg(l2_val=0.001)
-    net = NeuralNetwork(epochs=15, batch_size=16, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
-                        metric=accuracy, patience=2, min_delta=0.001)
+    regulator = L2Reg(l2_val=0.05)
+    net = NeuralNetwork(epochs=60, batch_size=30, optimizer=optimizer, regulator=regulator, verbose=True, loss=loss,
+                        metric=accuracy, patience=50, min_delta=0.001)
 
     n_features = X_train.shape[1]
-    net.add(DenseLayer(6, (n_features,)))
+    net.add(DenseLayer(32, (n_features,)))
     net.add(SigmoidActivation())
-    net.add(DropOutLayer(3, 0.5, (n_features,)))
+    net.add(DenseLayer(16, (n_features)))
+    net.add(SigmoidActivation())
+    net.add(DropOutLayer(8, 0.8, (n_features,)))
     net.add(DenseLayer(1))
     net.add(SigmoidActivation())
 
