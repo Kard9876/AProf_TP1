@@ -44,6 +44,7 @@
 - Scikit-learn (usado para pre-processar os dados)
 - nltk (deve usar-se Python 3.12)
 - gensim
+- keras-tuner
 
 ## Observações
 
