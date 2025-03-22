@@ -1,7 +1,6 @@
 import csv
 import requests
 
-# Defina sua chave da API DeepInfra
 API_KEY = "KvFRmpLfNyc6DgQzBT2iJNt7xPfqj2TK"
 
 
