@@ -45,6 +45,8 @@
 - nltk (deve usar-se Python 3.12)
 - gensim
 - keras-tuner
+- tensorflow (2.18.0)
+- tf-keras (2.18.0)
 
 ## Observações
 
