@@ -55,6 +55,5 @@
 
 ## Submissões
 
-- 1ª submissão. Executada num ambiente python 3.12.6, com numpy==1.26.4, pandas==2.2.3, scikit-learn==1.5.2, nltk==3.9.1, gensim==4.3.3
-- 2ª submissão:
-  - Ficheiro submissao2-grupo007-s1.ipynb executado num ambiente python 3.12.6, com numpy==1.26.4, pandas==2.2.3, scikit-learn==1.5.2, nltk==3.9.1, gensim==4.3.3 e tensorflow==2.18.0
+- 1ª submissão executada num ambiente python 3.12.6, com numpy==1.26.4, pandas==2.2.3, scikit-learn==1.5.2, nltk==3.9.1, gensim==4.3.3
+- 2ª submissão executada num ambiente python 3.12.6, com numpy==1.26.4, pandas==2.2.3, scikit-learn==1.5.2, nltk==3.9.1, gensim==4.3.3 e tensorflow==2.18.0
