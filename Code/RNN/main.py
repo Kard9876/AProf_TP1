@@ -95,8 +95,8 @@ def main(args):
                       '../../Dataset/DatasetsGerados/dataset_training_output.csv',
                       '../../Dataset/DatasetsGerados/dataset_validation_input.csv',
                       '../../Dataset/DatasetsGerados/dataset_validation_output.csv',
-                      '../../Dataset/DatasetsGerados/dataset_test_input.csv',
-                      '../../Dataset/DatasetsGerados/dataset_test_output.csv')
+                      '../../Dataset/DatasetsGerados/dataset1_inputs.csv',
+                      '../../Dataset/DatasetsGerados/dataset1_outputs.csv')
 
     X_train, y_train, X_validation, y_validation, X_test, y_test, ids = dataset.get_dataset_embedding(
         'Text', 'Label', sep='\t', rem_punctuation=False, vector_size=100, words_phrase=100
