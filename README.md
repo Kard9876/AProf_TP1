@@ -52,3 +52,9 @@
 
 - De forma a obter os mesmos resultados que o grupo de forma consistente, é necessário correr os executáveis com Python 3.12.6 num ambiente nativo (sem conda)
   - Isto é uma consequência da biblioteca nltk, a qual estamos a usar para fazer uma tokenização eficiente dos dados. O grupo reparou que, usando versões diferentes, os resultados podem variar em relação ao submetido
+
+## Submissões
+
+- 1ª submissão. Executada num ambiente python 3.12.6, com numpy==1.26.4, pandas==2.2.3, scikit-learn==1.5.2, nltk==3.9.1, gensim==4.3.3
+- 2ª submissão:
+  - Ficheiro submissao2-grupo007-s1.ipynb executado num ambiente python 3.12.6, com numpy==1.26.4, pandas==2.2.3, scikit-learn==1.5.2, nltk==3.9.1, gensim==4.3.3 e tensorflow==2.18.0
