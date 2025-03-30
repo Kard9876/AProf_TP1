@@ -37,6 +37,10 @@
 - A pasta Submissao1 é onde o grupo colocou os notebooks e as previsões necessárias à primeira submissão do trabalho
   - O grupo desejaria guardar os modelos para não precisar de os treinar a cada vez. No entanto, apesar de o poder fazer localmente, não consegue enviar os ficheiros com os modelos por ocuparem mais espaço do que o permitido pelo GitHub
 
+- Na pasta Submissao2 encontram-se os notebooks e as previsões necessárias à segunda submissão do trabalho
+
+- A pasta Submissao3 possui os notebooks e as previsões necessárias à terceira e última submissão do trabalho
+
 ## Dependências
 
 - Numpy
