@@ -34,7 +34,7 @@
   - A pasta `Notebooks/Implemented` é onde estão guardados os notebooks dos modelos implementados de raíz pelo grupo
   - A pasta `Notebooks/Tensorflow` é onde estão guardados os notebooks dos modelos tensorflow usados pelo grupo para as próximas fases do trabalho
 
-- A pasta `LLMs` é onde estão os notebooks que implementam a comunicação com as API's do deepseek e together.ai
+- A pasta `LLMs` é onde se encontram os notebooks que implementam a comunicação com as API's do deepseek e together.ai
 
 - A pasta `Submissao1` é onde o grupo colocou os notebooks e as previsões necessárias à primeira submissão do trabalho
   - O grupo desejaria guardar os modelos para não precisar de os treinar a cada vez. No entanto, apesar de o poder fazer localmente, não consegue enviar os ficheiros com os modelos por ocuparem mais espaço do que o permitido pelo GitHub
