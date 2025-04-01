@@ -30,7 +30,7 @@
 
 - As pastas `DNNOriginal`, `LogisticRegressionOriginal` e `RegularizationOriginal(PL02)` são pastas com o código base fornecido pelo docente nos quais nos baseamos para a construção de alguns modelos. o grupo decidiu mantê-las caso precise de backup de algum código
 
-- A pasta `Notebooks` é onde estão os diversos jupyter-notebooks dos modelos implementados
+- A pasta `Notebooks` é onde se encontram os diversos jupyter-notebooks dos modelos implementados
   - A pasta `Notebooks/Implemented` é onde estão guardados os notebooks dos modelos implementados de raíz pelo grupo
   - A pasta `Notebooks/Tensorflow` é onde estão guardados os notebooks dos modelos tensorflow usados pelo grupo para as próximas fases do trabalho
 
